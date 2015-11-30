@@ -5,10 +5,10 @@ import retrofit.RestAdapter;
 /**
  * Created by ThinkPad on 29.11.2015.
  */
-public class Client {
+public class ClientForHTTP {
     static private AllRequests client;
     private static final String servUrl = "http://192.168.1.193:1337";
-    private Client(){}
+    private ClientForHTTP(){}
     public static AllRequests sharedInstance(){
         if(client == null){
             RestAdapter what = new RestAdapter.Builder().setEndpoint(servUrl).build();
