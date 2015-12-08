@@ -1,0 +1,54 @@
+package com.example.thinkpad.testretrofitapp;
+
+import com.google.gson.annotations.SerializedName;
+
+import org.parceler.Parcel;
+
+/**
+ * Created by Арсений on 12/9/2015.
+ */
+@Parcel
+public class Group {
+    @SerializedName("aid")
+    public long id;
+
+    @SerializedName("title")
+    public String groupName;
+
+    @SerializedName("image_url")
+    public String imageURL;
+
+    public Group() {}
+
+    public Group(String songName, String imageURL) {
+        this.groupName = songName;
+        this.imageURL = imageURL;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public Group getGroup() {
+        return this;
+    }
+
+    public void setSong(String name, String imURL) {
+        this.groupName = name;
+        this.imageURL = imURL;
+    }
+
+    // Will be used by the ArrayAdapter in the ListView
+    @Override
+    public String toString(){
+        StringBuilder str = new StringBuilder();
+        str.append(" groupName : " + groupName);
+        str.append(" imageURL : " + imageURL);
+        return str.toString();
+    }
+
+}
