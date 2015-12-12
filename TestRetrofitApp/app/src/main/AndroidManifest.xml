@@ -21,14 +21,9 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".GroupActivity"
-            android:label="@string/title_activity_group"
-            android:parentActivityName=".MainActivity"
-            android:theme="@style/AppTheme">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.thinkpad.testretrofitapp.MainActivity" />
-        </activity>
+            android:name=".ViewSongActivity"
+            android:label="@string/title_activity_view_song"
+            android:theme="@style/AppTheme"></activity>
     </application>
 
 </manifest>

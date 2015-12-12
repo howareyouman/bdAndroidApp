@@ -1,8 +1,10 @@
 package com.example.thinkpad.testretrofitapp;
 
 import android.app.AlertDialog;
+import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.RecyclerView;
@@ -36,28 +38,70 @@ public class MainActivity extends FragmentActivity {
 
     private ClientForHTTP client;
     private DataBaseClient dataBase;
+    private  FragmentManager fm;
 
+    private SongListFragment slf;
+    private GroupListFragment glf;
+    private PlaylistsListFragment plf;
+    private Fragment currentFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         onCreateDrawer();
-        TextView text = (TextView) findViewById(R.id.textSongs);
-        text.setText("All Songs");
+
+        fm = getFragmentManager();
+
+        slf = new SongListFragment();
+        glf = new GroupListFragment();
+        plf = new PlaylistsListFragment();
+
+        fm.beginTransaction()
+                .add(R.id.FlashBarLayout,plf,"playlists")
+                .hide(plf)
+                .add(R.id.FlashBarLayout,glf,"groups")
+                .hide(glf)
+                .add(R.id.FlashBarLayout,slf,"songs")
+                .commit();
+        currentFragment = slf;
+
+
+
         dataBase = new DataBaseClient(this);
         dataBase.open();
-
-        songsList = new ArrayList<>();
-
-        getSongsFromBase();
-        initAdapter();
-        getSongsFromInternet();
 
     }
 
     private void getSongsFromBase() {
         songsList.addAll(dataBase.getAllSongs());
+    }
+
+    void SwitchTo (Fragment fragment, String name, String val)
+    {
+        if (fragment.isVisible())
+            return;
+        FragmentTransaction t = fm.beginTransaction();
+
+        // Make sure the next view is below the current one
+        fragment.getView().bringToFront();
+        // And bring the current one to the very top
+        currentFragment.getView().bringToFront();
+
+        // Hide the current fragment
+        t.hide(currentFragment);
+        if(!name.equals("")){
+            Bundle b = new Bundle();
+            b.putString(name,val);
+            fragment.setArguments(b);
+        }
+        t.show(fragment);
+        currentFragment = fragment;
+
+        // You probably want to add the transaction to the backstack
+        // so that user can use the back button
+        t.addToBackStack(null);
+        t.commit();
     }
 
     private void initAdapter() {
@@ -119,7 +163,7 @@ public class MainActivity extends FragmentActivity {
                 .withHeader(R.layout.drawer_header)
                 .addDrawerItems(
                         new PrimaryDrawerItem().withName(R.string.drawer_item_mysongs).withIcon(FontAwesome.Icon.faw_home).withIdentifier(1),
-                        new PrimaryDrawerItem().withName(R.string.drawer_item_groups).withIcon(FontAwesome.Icon.faw_eye).withIdentifier(2),
+                        new PrimaryDrawerItem().withName("All my groups").withIcon(FontAwesome.Icon.faw_eye).withIdentifier(2),
                         new PrimaryDrawerItem().withName(R.string.drawer_item_playlist).withIcon(FontAwesome.Icon.faw_bed).withIdentifier(1),
                         new SecondaryDrawerItem().withName(R.string.drawer_item_settings).withIcon(FontAwesome.Icon.faw_cog),
                         new DividerDrawerItem(),
@@ -130,19 +174,13 @@ public class MainActivity extends FragmentActivity {
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id, IDrawerItem drawerItem) {
                         switch (position){
                             case 1:
-                                //Intent intent1 = new Intent(MainActivity.this, MainActivity.class);
-                                //intent1.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                //startActivity(intent1);
-                                //Toast.makeText(MainActivity.this, MainActivity.this.getString(((Nameable) drawerItem).getNameRes()), Toast.LENGTH_SHORT).show();
-                                //onBackPressed();
+                                SwitchTo(slf,"","");
                                 break;
                             case 2:
-                                Intent intent = new Intent(MainActivity.this, GroupActivity.class);
-                                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                startActivity(intent);
+                                SwitchTo(glf,"","");
                                 break;
                             case 3:
-                                Toast.makeText(MainActivity.this, "Playlists!", Toast.LENGTH_SHORT).show();
+                                SwitchTo(plf,"","");
                                 break;
                             case 4:
                                 Toast.makeText(MainActivity.this, "Settings!", Toast.LENGTH_SHORT).show();
@@ -156,6 +194,62 @@ public class MainActivity extends FragmentActivity {
                 })
                 .build();
     }
+
+    public ArrayList<Song> getSongs(){
+        ArrayList<Song> values;
+
+        dataBase.createSong(new Song(1,"V","1","",""));
+        dataBase.createSong(new Song(2, "No_Way_Out", "2", "", ""));
+        dataBase.createSong(new Song(3, "Army_of_Noise", "3", "", ""));
+        dataBase.createSong(new Song(4, "Skin", "5", "", ""));
+
+        values = dataBase.getAllSongs();
+
+        return values;
+
+    }
+
+    public ArrayList<Song> getSongsByGroup(Group group){
+        ArrayList<Song> values = new ArrayList<>();
+        /*values.add(new Song("1","","",""));
+        values.add(new Song("2","","",""));
+        values.add(new Song("3","","",""));
+        values.add(new Song("4","","",""));*/
+        return values;
+
+    }
+
+    public ArrayList<Group> getAllGroups(){
+        ArrayList<Group> arrayList;
+        dataBase.createGroup(new Group(1,"Group_1",""));
+        dataBase.createGroup(new Group(2, "Group_2", ""));
+        dataBase.createGroup(new Group(3, "Group_3", ""));
+        dataBase.createGroup(new Group(4, "Group_4", ""));
+
+        arrayList = dataBase.getAllGroups();
+
+        return arrayList;
+    }
+
+    public ArrayList<Playlist> getAllPlaylists(){
+        ArrayList<Playlist> arrayList;
+        //dataBase.createPlaylist(new Playlist(1, "For sleep"));
+        //dataBase.createPlaylist(new Playlist(2, "For run"));
+        //dataBase.createPlaylist(new Playlist(3, "For work"));
+
+        arrayList = dataBase.getAllPlaylists();
+        return arrayList;
+    }
+
+    public boolean newPlaylist(String name){
+        int n = (dataBase.getAllPlaylists()).size();
+        return dataBase.createPlaylist(new Playlist(n+1,name));
+    }
+
+    public boolean deletePlaylist(String name){
+        return dataBase.deletePlaylist(name);
+    }
+
     @Override
     public void onBackPressed(){
         if(drawerResult.isDrawerOpen()){

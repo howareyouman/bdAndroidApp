@@ -5,8 +5,6 @@ package com.example.thinkpad.testretrofitapp;
  */
 import com.google.gson.annotations.SerializedName;
 
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.parceler.Parcel;
 
 @Parcel
@@ -28,7 +26,8 @@ public class Song {
 
     public Song() {}
 
-    public Song(String songName, String artistName, String audioURL, String imageURL) {
+    public Song(long id,String songName, String artistName, String audioURL, String imageURL) {
+        this.id = id;
         this.songName = songName;
         this.artistName = artistName;
         this.audioURL = audioURL;
@@ -58,10 +57,8 @@ public class Song {
     @Override
     public String toString(){
         StringBuilder str = new StringBuilder();
-        str.append(" songName : " + songName);
-        str.append(" songAuthor : " + artistName);
-        str.append(" audioURL : " + audioURL);
-        str.append(" imageURL : " + imageURL);
+        str.append(artistName);
+        str.append(" - " + songName);
         return str.toString();
     }
 }

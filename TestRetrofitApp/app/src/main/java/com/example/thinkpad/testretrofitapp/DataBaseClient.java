@@ -15,41 +15,43 @@ import java.util.Collections;
 public class DataBaseClient {
 
     private SQLiteDatabase database;
-    private DataBaseSongs dbHelperSongs;
-    private DataBaseGroups dbHelperGroups;
+    private DataBase dbHelper;
 
-    private String[] allColumnsSongs = { DataBaseSongs.COLUMN_ID,
-            DataBaseSongs.COLUMN_SONGNAME, DataBaseSongs.COLUMN_AUTHORNAME,
-            DataBaseSongs.COLUMN_AUDIOURL, DataBaseSongs.COLUMN_IMAGEURL};
+    private String[] allColumnsSongs = { DataBase.COLUMN_ID,
+            DataBase.COLUMN_SONGNAME, DataBase.COLUMN_AUTHORNAME,
+            DataBase.COLUMN_AUDIOURL, DataBase.COLUMN_IMAGEURL};
 
-    private String[] allColumnsGroups = { DataBaseGroups.COLUMN_ID,
-            DataBaseGroups.COLUMN_GROUPNAME, DataBaseGroups.COLUMN_IMAGEURL};
+    private String[] allColumnsGroups = { DataBase.COLUMN_ID,
+            DataBase.COLUMN_GROUPNAME, DataBase.COLUMN_IMAGEURL};
+
+    private String[] allColumnsPlaylists = { DataBase.COLUMN_ID,
+            DataBase.COLUMN_PLAYLIST_NAME};
 
     public DataBaseClient(Context context) {
-        dbHelperGroups = new DataBaseGroups(context);
-        dbHelperSongs = new DataBaseSongs(context);
+        dbHelper = new DataBase(context);
     }
 
     public void open() throws SQLException {
-        database = dbHelperSongs.getWritableDatabase();
+        database = dbHelper.getWritableDatabase();
+        dbHelper.onCreate(database);
     }
 
     public void close() {
-        dbHelperSongs.close();
-        dbHelperGroups.close();
+        dbHelper.close();
     }
 
     public boolean createGroup(Group group) {
         boolean isChanged = false;
         ContentValues values = new ContentValues();
-        Cursor cursor = database.query(DataBaseGroups.TABLE_NAME, null,"id = "+ group.id, null, null, null, null);
+        Cursor cursor = database.query(DataBase.TABLE_NAME_GROUPS, null,"groupname = \" "+ group.groupName + "\"", null, null, null, null);
         if(cursor.getCount() <= 0) {
             isChanged = true;
-            values.put(DataBaseGroups.COLUMN_ID, group.id);
-            values.put(DataBaseGroups.COLUMN_GROUPNAME, group.groupName);
-            values.put(DataBaseGroups.COLUMN_IMAGEURL, group.imageURL);
 
-            database.insert(dbHelperGroups.TABLE_NAME, null,
+            values.put(DataBase.COLUMN_ID, group.id);
+            values.put(DataBase.COLUMN_GROUPNAME, group.groupName);
+            values.put(DataBase.COLUMN_IMAGEURL, group.imageURL);
+
+            database.insert(dbHelper.TABLE_NAME_GROUPS, null,
                     values);
         }
         return isChanged;
@@ -58,16 +60,36 @@ public class DataBaseClient {
     public boolean createSong(Song song) {
         boolean isChanged = false;
         ContentValues values = new ContentValues();
-        Cursor cursor = database.query(DataBaseSongs.TABLE_NAME, null,"id = "+ song.id, null, null, null, null);
+        Cursor cursor = database.query(DataBase.TABLE_NAME_SONGS, null,"songname = \" "+ song.songName + "\"", null, null, null, null);
         if(cursor.getCount() <= 0) {
             isChanged = true;
-            values.put(DataBaseSongs.COLUMN_ID, song.id);
-            values.put(DataBaseSongs.COLUMN_SONGNAME, song.songName);
-            values.put(DataBaseSongs.COLUMN_AUTHORNAME, song.artistName);
-            values.put(DataBaseSongs.COLUMN_AUDIOURL, song.audioURL);
-            values.put(DataBaseSongs.COLUMN_IMAGEURL, song.imageURL);
+            values.put(DataBase.COLUMN_ID, song.id);
+            values.put(DataBase.COLUMN_SONGNAME, song.songName);
+            values.put(DataBase.COLUMN_AUTHORNAME, song.artistName);
+            values.put(DataBase.COLUMN_AUDIOURL, song.audioURL);
+            values.put(DataBase.COLUMN_IMAGEURL, song.imageURL);
 
-            database.insert(dbHelperSongs.TABLE_NAME, null,
+            database.insert(dbHelper.TABLE_NAME_SONGS, null,
+                    values);
+        }
+        return isChanged;
+    }
+
+    public boolean createPlaylist(Playlist playlist) {
+        boolean isChanged = false;
+        ContentValues values = new ContentValues();
+        Cursor cursor = database.query(
+                DataBase.TABLE_NAME_PLAYLISTS,
+                null,
+                DataBase.COLUMN_PLAYLIST_NAME + " = \""+ playlist.playListName + "\"",
+                null, null, null, null);
+
+        if(cursor.getCount() <= 0) {
+            isChanged = true;
+            values.put(DataBase.COLUMN_ID, playlist.id);
+            values.put(DataBase.COLUMN_PLAYLIST_NAME, playlist.playListName);
+
+            database.insert(dbHelper.TABLE_NAME_PLAYLISTS, null,
                     values);
         }
         return isChanged;
@@ -75,7 +97,7 @@ public class DataBaseClient {
 
     public ArrayList<Song> getAllSongs() {
         ArrayList<Song> comments = new ArrayList<>();
-        Cursor cursor = database.query(DataBaseSongs.TABLE_NAME, allColumnsSongs, null, null, null, null, null);
+        Cursor cursor = database.query(DataBase.TABLE_NAME_SONGS, allColumnsSongs, null, null, null, null, null);
 
         cursor.moveToFirst();
 
@@ -90,13 +112,73 @@ public class DataBaseClient {
         return comments;
     }
 
+    public ArrayList<Group> getAllGroups() {
+        ArrayList<Group> comments = new ArrayList<>();
+        Cursor cursor = database.query(DataBase.TABLE_NAME_GROUPS, allColumnsGroups, null, null, null, null, null);
+
+        cursor.moveToFirst();
+
+        while (!cursor.isAfterLast()) {
+            Group comment = cursorToGroup(cursor);
+            comments.add(comment);
+            cursor.moveToNext();
+        }
+
+        cursor.close();
+        Collections.reverse(comments);
+        return comments;
+    }
+
+    public ArrayList<Playlist> getAllPlaylists() {
+        ArrayList<Playlist> comments = new ArrayList<>();
+        Cursor cursor = database.query(DataBase.TABLE_NAME_PLAYLISTS, allColumnsPlaylists, null, null, null, null, null);
+
+        cursor.moveToFirst();
+
+        while (!cursor.isAfterLast()) {
+            Playlist comment = cursorToPlaylist(cursor);
+            comments.add(comment);
+            cursor.moveToNext();
+        }
+
+        cursor.close();
+        Collections.reverse(comments);
+        return comments;
+    }
+
+    private Playlist cursorToPlaylist(Cursor cursor) {
+        Playlist playlist = new Playlist(
+                cursor.getLong(cursor.getColumnIndex(DataBase.COLUMN_ID)),
+                cursor.getString(cursor.getColumnIndex(DataBase.COLUMN_PLAYLIST_NAME))
+        );
+        return playlist;
+    }
+
+    private Group cursorToGroup(Cursor cursor) {
+        Group group = new Group(
+                cursor.getLong(cursor.getColumnIndex(DataBase.COLUMN_ID)),
+                cursor.getString(cursor.getColumnIndex(DataBase.COLUMN_GROUPNAME)),
+                cursor.getString(cursor.getColumnIndex(DataBase.COLUMN_IMAGEURL))
+        );
+        return group;
+    }
+
     private Song cursorToSong(Cursor cursor) {
-        Song song = new Song();
-        //song.setId(cursor.getLong(0));
-        song.setSong(cursor.getString(cursor.getColumnIndex(DataBaseSongs.COLUMN_SONGNAME)),
-                cursor.getString(cursor.getColumnIndex(DataBaseSongs.COLUMN_AUTHORNAME)),
-                cursor.getString(cursor.getColumnIndex(DataBaseSongs.COLUMN_AUDIOURL)),
-                cursor.getString(cursor.getColumnIndex(DataBaseSongs.COLUMN_IMAGEURL)));
+        Song song = new Song(
+                cursor.getLong(cursor.getColumnIndex(DataBase.COLUMN_ID)),
+                cursor.getString(cursor.getColumnIndex(DataBase.COLUMN_SONGNAME)),
+                cursor.getString(cursor.getColumnIndex(DataBase.COLUMN_AUTHORNAME)),
+                cursor.getString(cursor.getColumnIndex(DataBase.COLUMN_AUDIOURL)),
+                cursor.getString(cursor.getColumnIndex(DataBase.COLUMN_IMAGEURL))
+        );
         return song;
+    }
+
+    public boolean deletePlaylist(String playlistName){
+        boolean is_changed = false;
+        int tmp = database.delete(DataBase.TABLE_NAME_PLAYLISTS,DataBase.COLUMN_PLAYLIST_NAME + " = ?", new String[] { playlistName });
+        if(tmp != 0)
+            is_changed = true;
+        return is_changed;
     }
 }

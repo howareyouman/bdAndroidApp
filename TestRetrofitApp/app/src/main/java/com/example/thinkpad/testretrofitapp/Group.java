@@ -20,7 +20,8 @@ public class Group {
 
     public Group() {}
 
-    public Group(String songName, String imageURL) {
+    public Group(long id,String songName, String imageURL) {
+        this.id = id;
         this.groupName = songName;
         this.imageURL = imageURL;
     }
@@ -37,10 +38,6 @@ public class Group {
         return this;
     }
 
-    public void setSong(String name, String imURL) {
-        this.groupName = name;
-        this.imageURL = imURL;
-    }
 
     // Will be used by the ArrayAdapter in the ListView
     @Override
