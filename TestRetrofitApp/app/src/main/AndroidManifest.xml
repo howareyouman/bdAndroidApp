@@ -11,7 +11,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".MainActivity"
+            android:name=".activities.MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -21,7 +21,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ViewSongActivity"
+            android:name=".activities.ViewSongActivity"
             android:label="@string/title_activity_view_song"
             android:theme="@style/AppTheme"></activity>
     </application>

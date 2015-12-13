@@ -1,10 +1,14 @@
-package com.example.thinkpad.testretrofitapp;
+package com.example.thinkpad.testretrofitapp.databases;
 
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+
+import com.example.thinkpad.testretrofitapp.basicclasses.Song;
+import com.example.thinkpad.testretrofitapp.basicclasses.Group;
+import com.example.thinkpad.testretrofitapp.basicclasses.Playlist;
 
 import java.util.ArrayList;
 import java.util.Collections;

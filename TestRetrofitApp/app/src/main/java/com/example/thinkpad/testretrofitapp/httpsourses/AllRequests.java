@@ -1,4 +1,4 @@
-package com.example.thinkpad.testretrofitapp;
+package com.example.thinkpad.testretrofitapp.httpsourses;
 
 import retrofit.Callback;
 import retrofit.client.Response;

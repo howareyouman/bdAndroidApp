@@ -1,4 +1,4 @@
-package com.example.thinkpad.testretrofitapp;
+package com.example.thinkpad.testretrofitapp.fragments;
 
 import android.app.Activity;
 import android.app.FragmentTransaction;
@@ -14,6 +14,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 
+import com.example.thinkpad.testretrofitapp.R;
+import com.example.thinkpad.testretrofitapp.activities.MainActivity;
+import com.example.thinkpad.testretrofitapp.basicclasses.Playlist;
+
 import java.util.ArrayList;
 
 /**
@@ -21,11 +25,11 @@ import java.util.ArrayList;
  */
 public class PlaylistsListFragment extends ListFragment
         implements View.OnClickListener {
+    MainActivity activity;
+    EditText title;
     private ArrayList<String> arrayStrings;
     private ArrayList<Playlist> arrayPlaylists;
     private int pos = 0;
-    MainActivity activity;
-    EditText title;
 
     @Override
     public View onCreateView(LayoutInflater inflater,ViewGroup container, Bundle savedInstanceState) {

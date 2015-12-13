@@ -1,4 +1,4 @@
-package com.example.thinkpad.testretrofitapp;
+package com.example.thinkpad.testretrofitapp.fragments;
 
 import android.app.Activity;
 import android.app.ListFragment;
@@ -11,6 +11,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+
+import com.example.thinkpad.testretrofitapp.R;
+import com.example.thinkpad.testretrofitapp.activities.MainActivity;
+import com.example.thinkpad.testretrofitapp.activities.ViewSongActivity;
+import com.example.thinkpad.testretrofitapp.basicclasses.Song;
 
 import org.parceler.Parcels;
 
