@@ -79,6 +79,10 @@ public class PlaylistsListFragment extends ListFragment
     @Override
     public boolean onContextItemSelected(MenuItem item){
         if(item.getTitle()=="Show songs"){
+            activity.what = 2;
+            activity.nameOfWhat = arrayPlaylists.get(pos).playListName;
+            ViewSongsFromEverywhereFragment v = new ViewSongsFromEverywhereFragment();
+            activity.setNewFragment(v);
         }
         else if(item.getTitle()=="Delete"){
             if(activity.deletePlaylist(arrayPlaylists.get(pos).playListName)) {

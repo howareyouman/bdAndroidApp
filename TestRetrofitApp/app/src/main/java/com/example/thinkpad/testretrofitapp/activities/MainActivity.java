@@ -13,15 +13,16 @@ import android.widget.AdapterView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.thinkpad.testretrofitapp.httpsourses.ClientForHTTP;
-import com.example.thinkpad.testretrofitapp.databases.DataBaseClient;
-import com.example.thinkpad.testretrofitapp.basicclasses.Group;
-import com.example.thinkpad.testretrofitapp.fragments.GroupListFragment;
-import com.example.thinkpad.testretrofitapp.basicclasses.Playlist;
-import com.example.thinkpad.testretrofitapp.fragments.PlaylistsListFragment;
 import com.example.thinkpad.testretrofitapp.R;
+import com.example.thinkpad.testretrofitapp.basicclasses.Group;
+import com.example.thinkpad.testretrofitapp.basicclasses.Playlist;
 import com.example.thinkpad.testretrofitapp.basicclasses.Song;
+import com.example.thinkpad.testretrofitapp.databases.DataBaseClient;
+import com.example.thinkpad.testretrofitapp.fragments.GroupListFragment;
+import com.example.thinkpad.testretrofitapp.fragments.PlaylistsListFragment;
 import com.example.thinkpad.testretrofitapp.fragments.SongListFragment;
+import com.example.thinkpad.testretrofitapp.fragments.ViewSongsFromEverywhereFragment;
+import com.example.thinkpad.testretrofitapp.httpsourses.ClientForHTTP;
 import com.mikepenz.iconics.typeface.FontAwesome;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.model.DividerDrawerItem;
@@ -33,6 +34,9 @@ import java.util.ArrayList;
 
 public class MainActivity extends FragmentActivity {
     static boolean isActive = false;
+    public ViewSongsFromEverywhereFragment vsf;
+    public int what = 0;
+    public String nameOfWhat = null;
     protected Drawer.Result drawerResult = null;
     private ClientForHTTP clientForHTTP;
     private TextView text;
@@ -40,11 +44,9 @@ public class MainActivity extends FragmentActivity {
     private RecyclerView.LayoutManager mLayoutManager;
     private RecyclerView.Adapter mAdapter;
     private ArrayList<Song> songsList;
-
     private ClientForHTTP client;
     private DataBaseClient dataBase;
     private  FragmentManager fm;
-
     private SongListFragment slf;
     private GroupListFragment glf;
     private PlaylistsListFragment plf;
@@ -61,9 +63,11 @@ public class MainActivity extends FragmentActivity {
         slf = new SongListFragment();
         glf = new GroupListFragment();
         plf = new PlaylistsListFragment();
+        vsf = new ViewSongsFromEverywhereFragment();
+        /**/
 
         fm.beginTransaction()
-                .add(R.id.FlashBarLayout,plf,"playlists")
+                .add(R.id.FlashBarLayout, plf, "playlists")
                 .hide(plf)
                 .add(R.id.FlashBarLayout,glf,"groups")
                 .hide(glf)
@@ -82,7 +86,7 @@ public class MainActivity extends FragmentActivity {
         songsList.addAll(dataBase.getAllSongs());
     }
 
-    void SwitchTo (Fragment fragment, String name, String val)
+    public void SwitchTo (Fragment fragment, String name, String val)
     {
         if (fragment.isVisible())
             return;
@@ -97,7 +101,7 @@ public class MainActivity extends FragmentActivity {
         t.hide(currentFragment);
         if(!name.equals("")){
             Bundle b = new Bundle();
-            b.putString(name,val);
+            b.putString(name, val);
             fragment.setArguments(b);
         }
         t.show(fragment);
@@ -106,6 +110,14 @@ public class MainActivity extends FragmentActivity {
         // You probably want to add the transaction to the backstack
         // so that user can use the back button
         t.addToBackStack(null);
+        t.commit();
+    }
+    public void setNewFragment(Fragment fragment){
+        FragmentTransaction t = fm.beginTransaction();
+        t.add(R.id.FlashBarLayout,fragment,"");
+        t.hide(currentFragment);
+        t.show(fragment);
+        currentFragment = fragment;
         t.commit();
     }
 
@@ -214,12 +226,22 @@ public class MainActivity extends FragmentActivity {
 
     }
 
-    public ArrayList<Song> getSongsByGroup(Group group){
+    public ArrayList<Song> getSongsByPlaylist(){
         ArrayList<Song> values = new ArrayList<>();
-        /*values.add(new Song("1","","",""));
-        values.add(new Song("2","","",""));
-        values.add(new Song("3","","",""));
-        values.add(new Song("4","","",""));*/
+        values.add(new Song(1, "123", "", "", ""));
+        values.add(new Song(2, "234", "", "", ""));
+        values.add(new Song(3, "345", "", "", ""));
+        values.add(new Song(4,"456","","",""));
+        return values;
+
+    }
+
+    public ArrayList<Song> getSongsByGroup(){
+        ArrayList<Song> values = new ArrayList<>();
+        values.add(new Song(1,"1","","",""));
+        values.add(new Song(2,"2","","",""));
+        values.add(new Song(3,"3","","",""));
+        values.add(new Song(4,"4","","",""));
         return values;
 
     }
