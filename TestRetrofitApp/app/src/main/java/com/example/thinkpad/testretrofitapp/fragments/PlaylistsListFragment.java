@@ -69,8 +69,10 @@ public class PlaylistsListFragment extends ListFragment
         switch (v.getId()) {
             case R.id.newPlaylistButton:
                 String text = title.getText().toString();
-                if(activity.newPlaylist(text)){
-                    upgrade();
+                if(!text.equals("")) {
+                    if (activity.newPlaylist(text)) {
+                        upgrade();
+                    }
                 }
                 break;
         }

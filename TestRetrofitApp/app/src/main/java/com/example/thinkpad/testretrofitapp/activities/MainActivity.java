@@ -114,7 +114,7 @@ public class MainActivity extends FragmentActivity {
     }
     public void setNewFragment(Fragment fragment){
         FragmentTransaction t = fm.beginTransaction();
-        t.add(R.id.FlashBarLayout,fragment,"");
+        t.add(R.id.FlashBarLayout, fragment, "");
         t.hide(currentFragment);
         t.show(fragment);
         currentFragment = fragment;
@@ -183,6 +183,7 @@ public class MainActivity extends FragmentActivity {
                         new PrimaryDrawerItem().withName("All my groups").withIcon(FontAwesome.Icon.faw_eye).withIdentifier(2),
                         new PrimaryDrawerItem().withName(R.string.drawer_item_playlist).withIcon(FontAwesome.Icon.faw_bed).withIdentifier(1),
                         new SecondaryDrawerItem().withName(R.string.drawer_item_settings).withIcon(FontAwesome.Icon.faw_cog),
+                        new PrimaryDrawerItem().withName("Exit").withIcon(FontAwesome.Icon.faw_android),
                         new DividerDrawerItem(),
                         new SecondaryDrawerItem().withName(R.string.drawer_item_contact).withIcon(FontAwesome.Icon.faw_github).withIdentifier(1)
                 )
@@ -201,6 +202,9 @@ public class MainActivity extends FragmentActivity {
                                 break;
                             case 4:
                                 Toast.makeText(MainActivity.this, "Settings!", Toast.LENGTH_SHORT).show();
+                                break;
+                            case 5:
+                                openQuitDialog();
                                 break;
 
                             default:
@@ -279,12 +283,12 @@ public class MainActivity extends FragmentActivity {
 
     @Override
     public void onBackPressed(){
+
+    }
+    private void openQuitDialog() {
         if(drawerResult.isDrawerOpen()){
             drawerResult.closeDrawer();
         }
-        openQuitDialog();
-    }
-    private void openQuitDialog() {
         AlertDialog.Builder quitDialog = new AlertDialog.Builder(
                 MainActivity.this);
         quitDialog.setTitle("Выход: Вы уверены?");
