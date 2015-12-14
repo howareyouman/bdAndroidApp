@@ -43,8 +43,7 @@ public class Group {
     @Override
     public String toString(){
         StringBuilder str = new StringBuilder();
-        str.append(" groupName : " + groupName);
-        str.append(" imageURL : " + imageURL);
+        str.append(groupName);
         return str.toString();
     }
 

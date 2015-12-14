@@ -71,6 +71,7 @@ public class PlaylistsListFragment extends ListFragment
                 String text = title.getText().toString();
                 if(!text.equals("")) {
                     if (activity.newPlaylist(text)) {
+                        title.setText("");
                         upgrade();
                     }
                 }

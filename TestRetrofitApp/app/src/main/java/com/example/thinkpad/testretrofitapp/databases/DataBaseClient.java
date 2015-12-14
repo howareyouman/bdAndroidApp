@@ -18,12 +18,12 @@ import java.util.Collections;
 
 public class DataBaseClient {
 
-    private SQLiteDatabase database;
+    public SQLiteDatabase database;
     private DataBase dbHelper;
 
     private String[] allColumnsSongs = { DataBase.COLUMN_ID,
             DataBase.COLUMN_SONGNAME, DataBase.COLUMN_AUTHORNAME,
-            DataBase.COLUMN_AUDIOURL, DataBase.COLUMN_IMAGEURL};
+            DataBase.COLUMN_AUDIOURL, DataBase.COLUMN_IMAGEURL, DataBase.COLUMN_PLAYLIST_NAME};
 
     private String[] allColumnsGroups = { DataBase.COLUMN_ID,
             DataBase.COLUMN_GROUPNAME, DataBase.COLUMN_IMAGEURL};
@@ -64,7 +64,7 @@ public class DataBaseClient {
     public boolean createSong(Song song) {
         boolean isChanged = false;
         ContentValues values = new ContentValues();
-        Cursor cursor = database.query(DataBase.TABLE_NAME_SONGS, null,"songname = \" "+ song.songName + "\"", null, null, null, null);
+        Cursor cursor = database.query(DataBase.TABLE_NAME_SONGS, null,"songname = \""+ song.songName + "\" and " + "playlistname = \""+ song.playlist+ "\"", null, null, null, null);
         if(cursor.getCount() <= 0) {
             isChanged = true;
             values.put(DataBase.COLUMN_ID, song.id);
@@ -72,6 +72,7 @@ public class DataBaseClient {
             values.put(DataBase.COLUMN_AUTHORNAME, song.artistName);
             values.put(DataBase.COLUMN_AUDIOURL, song.audioURL);
             values.put(DataBase.COLUMN_IMAGEURL, song.imageURL);
+            values.put(DataBase.COLUMN_PLAYLIST_NAME,song.playlist);
 
             database.insert(dbHelper.TABLE_NAME_SONGS, null,
                     values);
@@ -101,7 +102,7 @@ public class DataBaseClient {
 
     public ArrayList<Song> getAllSongs() {
         ArrayList<Song> comments = new ArrayList<>();
-        Cursor cursor = database.query(DataBase.TABLE_NAME_SONGS, allColumnsSongs, null, null, null, null, null);
+        Cursor cursor = database.query(DataBase.TABLE_NAME_SONGS, null, "playlistname = \""+ "MySongs"+ "\"", null, null, null, null);
 
         cursor.moveToFirst();
 
@@ -150,6 +151,22 @@ public class DataBaseClient {
         return comments;
     }
 
+    public ArrayList<Song> getSongByPlaylist(String playlist){
+        ArrayList<Song> comments = new ArrayList<>();
+        Cursor cursor = database.query(DataBase.TABLE_NAME_SONGS, null,DataBase.COLUMN_PLAYLIST_NAME + " = \""+ playlist + "\"" , null, null, null, null);
+        cursor.moveToFirst();
+
+        while (!cursor.isAfterLast()) {
+            Song comment = cursorToSong(cursor);
+            comments.add(comment);
+            cursor.moveToNext();
+        }
+
+        cursor.close();
+        Collections.reverse(comments);
+        return  comments;
+    }
+
     private Playlist cursorToPlaylist(Cursor cursor) {
         Playlist playlist = new Playlist(
                 cursor.getLong(cursor.getColumnIndex(DataBase.COLUMN_ID)),
@@ -167,22 +184,92 @@ public class DataBaseClient {
         return group;
     }
 
+    public int countAllSongs(){
+        ArrayList<Song> comments = new ArrayList<>();
+        Cursor cursor = database.query(DataBase.TABLE_NAME_SONGS, allColumnsSongs,null, null, null, null, null);
+        cursor.moveToFirst();
+
+        while (!cursor.isAfterLast()) {
+            Song comment = cursorToSong(cursor);
+            comments.add(comment);
+            cursor.moveToNext();
+        }
+
+        cursor.close();
+        Collections.reverse(comments);
+        return  comments.size();
+    }
+
+    public int countAllGroups(){
+        ArrayList<Group> comments = new ArrayList<>();
+        Cursor cursor = database.query(DataBase.TABLE_NAME_GROUPS, allColumnsGroups,null, null, null, null, null);
+        cursor.moveToFirst();
+
+        while (!cursor.isAfterLast()) {
+            Group comment = cursorToGroup(cursor);
+            comments.add(comment);
+            cursor.moveToNext();
+        }
+
+        cursor.close();
+        Collections.reverse(comments);
+        return  comments.size();
+    }
+
+    public int countAllPlaylists(){
+        ArrayList<Playlist> comments = new ArrayList<>();
+        Cursor cursor = database.query(DataBase.TABLE_NAME_PLAYLISTS, allColumnsPlaylists,null, null, null, null, null);
+        cursor.moveToFirst();
+
+        while (!cursor.isAfterLast()) {
+            Playlist comment = cursorToPlaylist(cursor);
+            comments.add(comment);
+            cursor.moveToNext();
+        }
+
+        cursor.close();
+        Collections.reverse(comments);
+        return  comments.size();
+    }
+
     private Song cursorToSong(Cursor cursor) {
         Song song = new Song(
                 cursor.getLong(cursor.getColumnIndex(DataBase.COLUMN_ID)),
                 cursor.getString(cursor.getColumnIndex(DataBase.COLUMN_SONGNAME)),
                 cursor.getString(cursor.getColumnIndex(DataBase.COLUMN_AUTHORNAME)),
                 cursor.getString(cursor.getColumnIndex(DataBase.COLUMN_AUDIOURL)),
-                cursor.getString(cursor.getColumnIndex(DataBase.COLUMN_IMAGEURL))
+                cursor.getString(cursor.getColumnIndex(DataBase.COLUMN_IMAGEURL)),
+                cursor.getString(cursor.getColumnIndex(DataBase.COLUMN_PLAYLIST_NAME))
         );
         return song;
     }
 
     public boolean deletePlaylist(String playlistName){
-        boolean is_changed = false;
-        int tmp = database.delete(DataBase.TABLE_NAME_PLAYLISTS,DataBase.COLUMN_PLAYLIST_NAME + " = ?", new String[] { playlistName });
-        if(tmp != 0)
-            is_changed = true;
-        return is_changed;
+        boolean isChanged = false;
+        int fromTablePlaylists = database.delete(DataBase.TABLE_NAME_PLAYLISTS,DataBase.COLUMN_PLAYLIST_NAME + " =?", new String[] { playlistName });
+        int fromTableSongs = database.delete(DataBase.TABLE_NAME_SONGS,DataBase.COLUMN_PLAYLIST_NAME + " =?",new String[] { playlistName });
+        if(fromTablePlaylists != 0 || fromTableSongs != 0)
+            isChanged = true;
+        return isChanged;
+    }
+
+    public boolean deleteGroup(String groupName){
+        boolean isChanged = false;
+        int fromTableGroups = database.delete(DataBase.TABLE_NAME_GROUPS,DataBase.COLUMN_GROUPNAME + " = ?",new String[]{groupName});
+        if(fromTableGroups >0)
+            isChanged = true;
+        return isChanged;
+    }
+
+    public boolean deleteSong(Song song){
+        boolean isChanged = false;
+        int fromTableGroups = database.delete(DataBase.TABLE_NAME_SONGS, DataBase.COLUMN_SONGNAME + "=\"" + song.songName+"\""+
+                       " and " + DataBase.COLUMN_AUTHORNAME + "=\"" +song.artistName+"\"" +
+                        " and " + DataBase.COLUMN_PLAYLIST_NAME + "=\"" + song.playlist+"\""
+                ,null);
+
+        if(fromTableGroups > 0)
+            isChanged = true;
+        return isChanged;
     }
 }

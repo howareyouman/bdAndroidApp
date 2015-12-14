@@ -4,6 +4,8 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
 
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -23,6 +25,10 @@
         <activity
             android:name=".activities.ViewSongActivity"
             android:label="@string/title_activity_view_song"
+            android:theme="@style/AppTheme" />
+        <activity
+            android:name=".activities.SelectPlaylistActivity"
+            android:label="@string/title_activity_select_playlist"
             android:theme="@style/AppTheme"></activity>
     </application>
 

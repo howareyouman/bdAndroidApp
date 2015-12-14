@@ -9,4 +9,5 @@
     <string name="drawer_item_contact">Contact</string>
     <string name="title_activity_group">GroupActivity</string>
     <string name="title_activity_view_song">ViewSongActivity</string>
+    <string name="title_activity_select_playlist">SelectPlaylistActivity</string>
 </resources>

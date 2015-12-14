@@ -1,6 +1,7 @@
 package com.example.thinkpad.testretrofitapp.fragments;
 
 import android.app.Activity;
+import android.app.FragmentTransaction;
 import android.app.ListFragment;
 import android.os.Bundle;
 import android.view.ContextMenu;
@@ -53,6 +54,7 @@ public class GroupListFragment extends ListFragment {
         super.onCreateContextMenu(menu, v, menuInfo);
         menu.setHeaderTitle("Select The Action");
         menu.add(0, v.getId(), 0, "Show songs");//groupId, itemId, order, title
+        menu.add(0, v.getId(), 0, "Delete group");
     }
 
     @Override
@@ -62,10 +64,18 @@ public class GroupListFragment extends ListFragment {
             activity.nameOfWhat = arrayGroups.get(pos).groupName;
             ViewSongsFromEverywhereFragment v = new ViewSongsFromEverywhereFragment();
             activity.setNewFragment(v);
-        } else{
+        }  else if(item.getTitle()=="Delete group"){
+            if(activity.deleteGroup(arrayGroups.get(pos).groupName))
+                upgrade();
+        } else {
             return false;
         }
         return true;
+    }
+
+    private void upgrade(){
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        ft.detach(this).attach(this).commit();
     }
 
     @Override
