@@ -63,11 +63,9 @@ public class SongListFragment extends ListFragment {
     @Override
     public boolean onContextItemSelected(MenuItem item){
         if(item.getTitle()=="Show"){
-            if(pos != 0) {
-                Intent intent = new Intent(getActivity(), ViewSongActivity.class);
-                intent.putExtra("song", Parcels.wrap(arraySongs.get(pos)));
-                startActivity(intent);
-            }
+            Intent intent = new Intent(getActivity(), ViewSongActivity.class);
+            intent.putExtra("song", Parcels.wrap(arraySongs.get(pos)));
+            startActivity(intent);
         } else if(item.getTitle()=="Add to playlist"){
             Intent intent = new Intent(getActivity(), SelectPlaylistActivity.class);
             startActivityForResult(intent,1);

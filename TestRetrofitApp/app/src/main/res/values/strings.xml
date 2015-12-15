@@ -10,4 +10,5 @@
     <string name="title_activity_group">GroupActivity</string>
     <string name="title_activity_view_song">ViewSongActivity</string>
     <string name="title_activity_select_playlist">SelectPlaylistActivity</string>
+    <string name="title_activity_main2">Main2Activity</string>
 </resources>

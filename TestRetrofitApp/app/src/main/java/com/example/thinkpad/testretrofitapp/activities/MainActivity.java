@@ -5,6 +5,8 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.FragmentActivity;
@@ -33,14 +35,17 @@ import java.io.File;
 import java.util.ArrayList;
 
 public class MainActivity extends FragmentActivity {
-    static final int PICK_CONTACT_REQUEST = 1;
     public ViewSongsFromEverywhereFragment vsf;
+
+
     public int what = 0;
     public int songId = 0;
     public int groupId = 0;
     public int playlistId = 0;
     public String nameOfWhat = null;
+
     public Song songToAdd = null;
+
     protected Drawer.Result drawerResult = null;
     private DataBaseClient dataBase;
     private  FragmentManager fm;
@@ -54,6 +59,7 @@ public class MainActivity extends FragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         onCreateDrawer();
+
         dataBase = new DataBaseClient(this);
         dataBase.open();
 
@@ -144,10 +150,10 @@ public class MainActivity extends FragmentActivity {
                         new PrimaryDrawerItem().withName(R.string.drawer_item_mysongs).withIcon(FontAwesome.Icon.faw_home).withIdentifier(1),
                         new PrimaryDrawerItem().withName("All my groups").withIcon(FontAwesome.Icon.faw_eye).withIdentifier(2),
                         new PrimaryDrawerItem().withName(R.string.drawer_item_playlist).withIcon(FontAwesome.Icon.faw_bed).withIdentifier(1),
-                        new SecondaryDrawerItem().withName(R.string.drawer_item_settings).withIcon(FontAwesome.Icon.faw_cog),
+                        new PrimaryDrawerItem().withName(R.string.drawer_item_settings).withIcon(FontAwesome.Icon.faw_cog),
                         new DividerDrawerItem(),
                         new SecondaryDrawerItem().withName(R.string.drawer_item_contact).withIcon(FontAwesome.Icon.faw_github).withIdentifier(1),
-                        new PrimaryDrawerItem().withName("Exit").withIcon(FontAwesome.Icon.faw_android)
+                        new SecondaryDrawerItem().withName("Exit").withIcon(FontAwesome.Icon.faw_android)
                 )
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
@@ -168,12 +174,12 @@ public class MainActivity extends FragmentActivity {
                             case 4:
                                 Toast.makeText(MainActivity.this, "Settings!", Toast.LENGTH_SHORT).show();
                                 break;
-                            case 5:
-                                openQuitDialog();
+                            case 6:
+                                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/howareyouman/bdAndroidApp"));
+                                startActivity(browserIntent);
                                 break;
-
-                            default:
-                                Toast.makeText(MainActivity.this, "default!", Toast.LENGTH_SHORT).show();
+                            case 7:
+                                openQuitDialog();
                                 break;
                         }
                     }
@@ -181,35 +187,34 @@ public class MainActivity extends FragmentActivity {
                 .build();
     }
     private void init(){
-        dataBase.createSong(new Song(++songId,"V","1","","","MySongs"));
-        dataBase.createSong(new Song(++songId, "No_Way_Out", "2", "", "","MySongs"));
-        dataBase.createSong(new Song(++songId, "Army_of_Noise", "3", "","","MySongs"));
-        dataBase.createSong(new Song(++songId, "Skin", "5", "","", "MySongs"));
+        if(dataBase.getAllSongs().size() == 0) {
+            dataBase.createSong(new Song(++songId, "Песня о друге", "Владимир Высоцкий", "http://bit.ly/1J8XvzN",
+                    "http://cdn.static4.rtr-vesti.ru/vh/pictures/gallery/256/929.jpg", "MySongs"));
+            dataBase.createSong(new Song(++songId, "All My Heart", "John Newman", "http://bit.ly/1RmeOVS", "http://i2.ytimg.com/vi/qdO2jKpFpw4/mqdefault.jpg", "MySongs"));
+            dataBase.createSong(new Song(++songId, "Drowning Shadows", "Sam Smith", "http://bit.ly/1RmeOVS", "http://www.thegarden.com/content/dam/msg/eventImg2/SamSmith_2015_328x253.jpg/_jcr_content/renditions/SamSmith_2015_328x253.328.254.jpg", "MySongs"));
+            dataBase.createSong(new Song(++songId, "-30", "Аквариум", "", "http://kvartalmuz.ru/wp-content/uploads/2015/07/post_thumb_pOlM01Muxh.jpg", "MySongs"));
+        }
 
+        if(dataBase.getAllGroups().size() == 0) {
+            dataBase.createGroup(new Group(++groupId, "Group_1", ""));
+            dataBase.createGroup(new Group(++groupId, "Group_2", ""));
+            dataBase.createGroup(new Group(++groupId, "Group_3", ""));
+            dataBase.createGroup(new Group(++groupId, "Group_4", ""));
+        }
 
-        dataBase.createGroup(new Group(++groupId, "Group_1", ""));
-        dataBase.createGroup(new Group(++groupId, "Group_2", ""));
-        dataBase.createGroup(new Group(++groupId, "Group_3", ""));
-        dataBase.createGroup(new Group(++groupId, "Group_4", ""));
-
-
-        dataBase.createPlaylist(new Playlist(++playlistId,"abc"));
-        dataBase.createPlaylist(new Playlist(++playlistId,"qwe"));
-        dataBase.createPlaylist(new Playlist(++playlistId,"wer"));
-        dataBase.createPlaylist(new Playlist(++playlistId,"ert"));
-        dataBase.createPlaylist(new Playlist(++playlistId,"rty"));
+        if(dataBase.getAllPlaylists().size() == 0) {
+            dataBase.createPlaylist(new Playlist(++playlistId, "Школьные хиты"));
+            dataBase.createPlaylist(new Playlist(++playlistId, "Для тренировки"));
+            dataBase.createPlaylist(new Playlist(++playlistId, "Русский рок"));
+            dataBase.createPlaylist(new Playlist(++playlistId, "Танцевальные хиты"));
+            dataBase.createPlaylist(new Playlist(++playlistId, "Зажигаем на работе"));
+        }
 
 
     }
 
     public ArrayList<Song> getSongs(){
-        ArrayList<Song> values;
-
-
-        values = dataBase.getAllSongs();
-
-        return values;
-
+        return dataBase.getAllSongs();
     }
 
     public ArrayList<Song> getSongsByPlaylist(String playlist){
@@ -222,10 +227,10 @@ public class MainActivity extends FragmentActivity {
 
     public ArrayList<Song> getSongsByGroup(){
         ArrayList<Song> values = new ArrayList<>();
-        values.add(new Song(++songId,"1","123","","",""));
-        values.add(new Song(++songId,"2","234","","",""));
-        values.add(new Song(++songId,"3","345","","",""));
-        values.add(new Song(++songId, "4", "456", "", "", ""));
+        values.add(new Song(++songId,"Light and Sound","Luke Million","http://bit.ly/1RmeOVS","https://avatars.yandex.net/get-music-content/629cc99d.a.2506673-1/600x600",""));
+        values.add(new Song(++songId,"The Good The Bad and The Crazy","Imany","http://bit.ly/1RmeOVS","https://avatars.yandex.net/get-music-content/d9dce70d.a.2818497-1/600x600",""));
+        values.add(new Song(++songId,"Intoxicated","Martin Solveig","http://bit.ly/1RmeOVS","https://avatars.yandex.net/get-music-content/173a234b.a.2656353-1/600x600",""));
+        values.add(new Song(++songId, "Papaoutai", "Stromae", "http://bit.ly/1RmeOVS", "https://avatars.yandex.net/get-music-content/6f4f0309.a.1565559-1/600x600", ""));
         return values;
 
     }
@@ -241,12 +246,7 @@ public class MainActivity extends FragmentActivity {
 
 
     public ArrayList<Group> getAllGroups(){
-        ArrayList<Group> arrayList;
-
-
-        arrayList = dataBase.getAllGroups();
-
-        return arrayList;
+        return dataBase.getAllGroups();
     }
     public void addToAllSongs(Song song){
         song.playlist = "MySongs";
@@ -257,13 +257,7 @@ public class MainActivity extends FragmentActivity {
     }
 
     public ArrayList<Playlist> getAllPlaylists(){
-        ArrayList<Playlist> arrayList;
-        //dataBase.createPlaylist(new Playlist(1, "For sleep"));
-        //dataBase.createPlaylist(new Playlist(2, "For run"));
-        //dataBase.createPlaylist(new Playlist(3, "For work"));
-
-        arrayList = dataBase.getAllPlaylists();
-        return arrayList;
+        return dataBase.getAllPlaylists();
     }
 
     public boolean newPlaylist(String name){
@@ -283,9 +277,7 @@ public class MainActivity extends FragmentActivity {
     }
 
     @Override
-    public void onBackPressed(){
-
-    }
+    public void onBackPressed(){}
 
     private void openQuitDialog() {
         if(drawerResult.isDrawerOpen()){

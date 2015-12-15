@@ -16,7 +16,10 @@ import android.widget.ListView;
 import com.example.thinkpad.testretrofitapp.R;
 import com.example.thinkpad.testretrofitapp.activities.MainActivity;
 import com.example.thinkpad.testretrofitapp.activities.SelectPlaylistActivity;
+import com.example.thinkpad.testretrofitapp.activities.ViewSongActivity;
 import com.example.thinkpad.testretrofitapp.basicclasses.Song;
+
+import org.parceler.Parcels;
 
 import java.util.ArrayList;
 
@@ -67,6 +70,7 @@ public class ViewSongsFromEverywhereFragment extends ListFragment {
     {
         super.onCreateContextMenu(menu, v, menuInfo);
         menu.setHeaderTitle("Select The Action");
+        menu.add(0, v.getId(), 0, "Show");
         menu.add(0, v.getId(), 0, "Add to all");
         menu.add(0, v.getId(), 0, "Add to playlist");
         if(activity.what == 2)
@@ -84,6 +88,10 @@ public class ViewSongsFromEverywhereFragment extends ListFragment {
         }else if(item.getTitle()=="Delete"){
             if(activity.deleteSong(arraySongs.get(pos)))
                 upgrade();
+        }else if(item.getTitle()=="Show"){
+            Intent intent = new Intent(getActivity(), ViewSongActivity.class);
+            intent.putExtra("song", Parcels.wrap(arraySongs.get(pos)));
+            startActivity(intent);
         }else{
             return false;
         }
